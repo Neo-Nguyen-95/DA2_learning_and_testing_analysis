@@ -1,1 +1,6 @@
 .DS_Store
+*.txt
+*.docx
+*.Rmd
+my_sample_data_wide_format.csv
+long_to_wide_format.py
