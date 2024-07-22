@@ -1,9 +1,3 @@
-#%% NEXT STEP
-"""
-Next: 
-    - add information curve of a group of question
-""" 
-
 #%% --- LIBRARY
 import pandas as pd
 import numpy as np
@@ -43,6 +37,11 @@ discrimination and difficulty, which is correctness percentage.
         
 - Part III: Misconception detection - shows you proportion of choice in\
 detail, so that you can dectect misconception in doubtful question.
+
+- Part IV: Student result - presents student's workd in detail and\
+compare the result with average completation of all student
+
+- Part V: IRT analysis - complex analysis with Item Test Theory
 
 Now, let's get started!
 """
@@ -316,6 +315,9 @@ app = Dash(__name__)
 
 app.layout = html.Div([
     # APP INTRO
+    html.Img(id='dash_image', src='assets/banner.png',
+             style={'width': '100%'}) ,
+    
     html.H1("WEB APP FOR LEARNING QUALITY ANALYSIS",
             style={'text-align': 'center'}
             ),
@@ -540,15 +542,27 @@ def student_result(student_id):
     
     return result
 
+
+average = subject_complete.copy()/100
+average = average.reset_index()
+average.columns = ['topic', 'IsCorrect']
+average['Object'] = 'Average Completation'
+
 @callback(
     Output('pie_competency', 'figure'),
     Input('student_dropdown', 'value')
     )
 def pie_competency(student_id):
     test_df = get_ability(student_id)
-    fig = px.line_polar(test_df, r='IsCorrect', theta='topic', line_close=True,
+    
+    test_df['Object'] = 'Student No.' + str(student_id)
+    test_df = pd.concat([test_df, average], axis='rows')
+    
+    
+    fig = px.line_polar(test_df, r='IsCorrect', theta='topic', color='Object',
+                        line_close=True,
                         range_r=[0, 1])
-    fig.update_traces(fill='toself')
+
     return fig
 
 #%% APP PART V
@@ -598,7 +612,7 @@ def icc(item_id, more_infor):
     if 'Add Information Curve' in more_infor:
         fig.add_trace(go.Scatter(x=theta_model, y=infor,
                                  mode='lines', name='Information Curve',
-                                 line=dict(dash='dash')))
+                                 line=dict(dash='dash', color='red')))
     if 'Add Difficulty Line' in more_infor:
         fig.add_shape(type='line', x0=b, y0=0, x1=b, y1=0.5,
                       line=dict(dash='dot', color='grey')
@@ -609,7 +623,7 @@ def icc(item_id, more_infor):
     if 'Add Empirical Point' in more_infor:
         fig.add_trace(go.Scatter(x=theta_empirical_group, y=P_empirical,
                                  mode='markers', name='Empirical Points',
-                                 marker=dict(size=10)))
+                                 marker=dict(size=10, color='green')))
     
     return fig
 
@@ -633,6 +647,8 @@ def info_curve(item_list):
         infor += (a**2) * P * (1-P)
     
     fig = px.line(x=theta, y=infor)
+    fig.update_layout(yaxis_title='Information', xaxis_title='Difficulty',
+               title_text='Test Information')
 
     return fig
 
