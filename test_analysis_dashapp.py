@@ -655,5 +655,8 @@ def info_curve(item_list):
 #%% --- RUN: http://127.0.0.1:8050/
 app.run(debug=True)
 
+# host an offline server through ngrok
+# ngrok http http://localhost:8050
+
 # if __name__ == '__main__':
 #     app.run_server(debug=True, port=8080, host='0.0.0.0')
