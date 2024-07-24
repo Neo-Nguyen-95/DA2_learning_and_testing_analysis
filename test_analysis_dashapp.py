@@ -170,7 +170,7 @@ dd_plot = px.scatter(
     )
 dd_plot.update_traces(textposition='top center')
 dd_plot.update_layout(
-    title_text='Question Quality in terms of Correctness Proportion\
+    title_text='Question Quality in terms of Correctness Proportion \
 and Discrimination',
     xaxis_title='Correctness Proportion [%]',
     yaxis_title='Discrimination [Pearson Corr]'
@@ -458,8 +458,12 @@ def item_spec(item_num):
             df_question_meta['SubjectId']
             .map(lambda x: int(x.strip('[]').split(",")[i]))
             )
+        df_question_meta['CurrentId'] = id_lv
+        
         name_lv = (
-            df_subject_meta[df_subject_meta['SubjectId'] == id_lv[item_num]][['Name']]
+            df_subject_meta[df_subject_meta['SubjectId'] == 
+                            df_question_meta.set_index('QuestionId')
+                            .loc[item_num, 'CurrentId']][['Name']]
             .iloc[0, 0]
             )
         spec.append(name_lv)
